@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  
+  pfa2-mysql-database:
+    image: mysql:5.7
+    container_name: mysql
+    volumes:
+      - ./dbdata:/var/lib/mysql:wr
+      - ./entrypointdb:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=Secret#9b45
+    networks:
+      - pfa2-database-net
+
+  pfa2-webapp:
+    build:
+      context: webapp
+    container_name: webapp
+    command: sh -c "dockerize -wait tcp://mysql:3306 -timeout 100s -wait-retry-interval 10s java -jar desafio-um-pfa-1.0.0.jar"
+    depends_on:
+      - pfa2-mysql-database
+    networks:
+      - pfa2-database-net
+      - pfa2-webapp-net
+
+  pfa2-nginx:
+    build:
+      context: nginx
+    container_name: nginx
+    networks:
+      - pfa2-webapp-net
+    depends_on:
+      - webapp
+    ports:
+      - "8000:80"
+    restart: always
+ 
+
+networks: 
+  pfa2-database-net:
+    driver: bridge
+  pfa2-webapp-net:
+    driver: bridge   
