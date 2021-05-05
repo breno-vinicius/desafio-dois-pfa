@@ -6,7 +6,7 @@ services:
     image: mysql:5.7
     container_name: mysql
     volumes:
-      - ./dbdata:/var/lib/mysql:wr
+      - ./dbdata:/var/lib/mysql
       - ./entrypointdb:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=Secret#9b45
@@ -31,7 +31,7 @@ services:
     networks:
       - pfa2-webapp-net
     depends_on:
-      - webapp
+      - pfa2-webapp
     ports:
       - "8000:80"
     restart: always
